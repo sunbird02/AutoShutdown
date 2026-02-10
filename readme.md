@@ -1,18 +1,18 @@
 # AutoShutdown - Windows 自动关机助手
 
-一个简洁、轻量的 Windows 自动关机工具，支持多种 UI 风格和定时模式。
+一个简洁、轻量的 Windows 自动关机工具，支持定时关机和倒计时关机。
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows-green.svg)
-![Language](https://img.shields.io/badge/language-C%2FC%2B%2B-orange.svg)
+![Language](https://img.shields.io/badge/language-C-orange.svg)
 
 ## 功能特点
 
-- **多种定时模式**：支持定时关机、倒计时关机
-- **多种操作类型**：关机、重启、待机/休眠
-- **多种 UI 风格**：经典版、现代深色主题版、赛博朋克终端风格版
+- **定时关机**：指定具体时间（如 23:00）自动关机
+- **倒计时关机**：设定分钟数后自动关机
+- **多种操作**：支持关机、重启、待机/休眠
 - **轻量免安装**：单文件可执行程序，无需安装
-- **管理员权限支持**：完整支持系统待机和休眠功能
+- **原生 Win32**：使用 Windows API 开发，体积小巧
 
 ## 下载
 
@@ -40,23 +40,14 @@
 - Windows 操作系统
 - [TCC (Tiny C Compiler)](https://bellard.org/tcc/) 或 MinGW/g++
 
-### 使用 TCC 编译
+### 编译命令
 
 ```powershell
-# 经典版（推荐，体积小）
+# 使用 TCC 编译
 tcc -o AutoShutdown.exe AutoShutdown.c -luser32 -lkernel32 -lgdi32
 
-# 现代深色主题版
-tcc -o AutoShutdown.exe AutoShutdown_modern.c -luser32 -lkernel32 -lgdi32 -lcomctl32 -lshell32
-
-# 管理员权限版
-tcc -o AutoShutdown.exe AutoShutdown_管理员.c -luser32 -lkernel32 -lgdi32 -lshell32
-```
-
-### 使用 MinGW/g++ 编译赛博朋克版
-
-```powershell
-g++ -o AutoShutdown_Cyberpunk.exe AutoShutdown_Cyberpunk.cpp -mwindows -lcomctl32 -lgdiplus -lgdi32 -luser32 -lkernel32
+# 或使用 MinGW/gcc
+gcc -o AutoShutdown.exe AutoShutdown.c -luser32 -lkernel32 -lgdi32
 ```
 
 ### 一键编译
@@ -71,13 +62,10 @@ g++ -o AutoShutdown_Cyberpunk.exe AutoShutdown_Cyberpunk.cpp -mwindows -lcomctl3
 
 ```
 AutoShutdown/
-├── AutoShutdown.c              # 经典版 - 原生 Win32 API
-├── AutoShutdown_modern.c       # 现代版 - 深色主题
-├── AutoShutdown_Cyberpunk.cpp  # 赛博朋克版 - GDI+
-├── AutoShutdown_管理员.c       # 管理员权限版
-├── 一键编译.bat               # 一键编译脚本
-├── 修复待机.bat               # 待机功能修复工具
-└── readme.md                   # 本文件
+├── AutoShutdown.c      # 主程序源码
+├── AutoShutdown.exe    # 编译后的可执行文件
+├── 一键编译.bat       # 编译脚本
+└── readme.md          # 本文件
 ```
 
 ## 系统操作实现
@@ -91,15 +79,14 @@ AutoShutdown/
 
 ## 注意事项
 
-- **待机功能问题**：部分系统可能阻止待机，运行 `修复待机.bat` 尝试修复
-- **权限问题**：待机和休眠功能需要管理员权限，建议使用管理员权限版本
 - **跨天时间**：定时模式会自动处理跨天情况
+- **权限问题**：待机和休眠功能可能需要管理员权限
 
 ## 技术栈
 
-- **语言**: C / C++
-- **API**: Win32 API, GDI+
-- **编译器**: TCC, MinGW/g++
+- **语言**: C
+- **API**: Win32 API
+- **编译器**: TCC, MinGW/gcc
 
 ## 许可证
 
