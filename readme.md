@@ -1,68 +1,86 @@
-# CODEBUDDY.md This file provides guidance to CodeBuddy when working with code in this repository.
+# AutoShutdown - Windows 自动关机助手
 
-## 项目概述
+一个简洁、轻量的 Windows 自动关机工具，支持多种 UI 风格和定时模式。
 
-这是一个 Windows 平台的自动关机助手应用程序，使用 Win32 API 和 C/C++ 开发。项目包含多个 UI 风格的版本：经典版、现代化深色主题版和赛博朋克终端风格版。
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows-green.svg)
+![Language](https://img.shields.io/badge/language-C%2FC%2B%2B-orange.svg)
 
-## 常用命令
+## 功能特点
 
-### 编译项目
+- **多种定时模式**：支持定时关机、倒计时关机
+- **多种操作类型**：关机、重启、待机/休眠
+- **多种 UI 风格**：经典版、现代深色主题版、赛博朋克终端风格版
+- **轻量免安装**：单文件可执行程序，无需安装
+- **管理员权限支持**：完整支持系统待机和休眠功能
+
+## 下载
+
+前往 [Releases](https://github.com/sunbird02/AutoShutdown/releases) 页面下载最新版本。
+
+## 使用方法
+
+1. 下载 `AutoShutdown.exe`
+2. 双击运行程序
+3. 选择操作类型（关机/重启/待机）
+4. 设置时间：
+   - **定时模式**：输入目标时间（如 `23:00`）
+   - **倒计时模式**：输入倒计时分钟数
+5. 点击「设置任务」启动定时器
+6. 可随时点击「取消任务」中止
+
+## 截图
+
+> 截图待添加
+
+## 编译
+
+### 环境要求
+
+- Windows 操作系统
+- [TCC (Tiny C Compiler)](https://bellard.org/tcc/) 或 MinGW/g++
+
+### 使用 TCC 编译
 
 ```powershell
-# 使用 TCC 编译经典版（推荐，体积小）
+# 经典版（推荐，体积小）
 tcc -o AutoShutdown.exe AutoShutdown.c -luser32 -lkernel32 -lgdi32
 
-# 使用 TCC 编译现代化版本
+# 现代深色主题版
 tcc -o AutoShutdown.exe AutoShutdown_modern.c -luser32 -lkernel32 -lgdi32 -lcomctl32 -lshell32
 
-# 使用 TCC 编译管理员权限版
+# 管理员权限版
 tcc -o AutoShutdown.exe AutoShutdown_管理员.c -luser32 -lkernel32 -lgdi32 -lshell32
+```
 
-# 使用 MinGW/g++ 编译赛博朋克版本（需要 GDI+）
+### 使用 MinGW/g++ 编译赛博朋克版
+
+```powershell
 g++ -o AutoShutdown_Cyberpunk.exe AutoShutdown_Cyberpunk.cpp -mwindows -lcomctl32 -lgdiplus -lgdi32 -luser32 -lkernel32
 ```
 
 ### 一键编译
 
+运行 `一键编译.bat` 自动检测 TCC 路径并编译：
+
 ```powershell
-# 运行批处理脚本（自动检测 TCC 路径并编译）
 .\一键编译.bat
 ```
 
-### 修复待机功能
+## 项目结构
 
-```powershell
-# 以管理员身份运行修复脚本
-.\修复待机.bat
+```
+AutoShutdown/
+├── AutoShutdown.c              # 经典版 - 原生 Win32 API
+├── AutoShutdown_modern.c       # 现代版 - 深色主题
+├── AutoShutdown_Cyberpunk.cpp  # 赛博朋克版 - GDI+
+├── AutoShutdown_管理员.c       # 管理员权限版
+├── 一键编译.bat               # 一键编译脚本
+├── 修复待机.bat               # 待机功能修复工具
+└── readme.md                   # 本文件
 ```
 
-## 代码架构
-
-### 文件结构
-
-- `AutoShutdown.c` - 经典版，使用原生 Win32 API，简洁稳定
-- `AutoShutdown_modern.c` - 现代化深色主题版，使用 Unicode 和自定义绘制
-- `AutoShutdown_Cyberpunk.cpp` - 赛博朋克终端风格版，使用 GDI+ 和现代 C++
-- `AutoShutdown_管理员.c` - 管理员权限版，处理 UAC 和待机功能
-- `一键编译.bat` - TCC 一键编译脚本
-- `修复待机.bat` - 修复系统待机/休眠功能的工具脚本
-
-### 核心功能模块
-
-所有版本共享相同的底层架构：
-
-1. **窗口过程 (WndProc)** - 处理 Windows 消息循环，响应用户交互
-2. **任务设置 (OnSet)** - 解析时间输入，计算倒计时，调用 `shutdown` 或 `rundll32 powrprof.dll` 执行操作
-3. **任务取消 (OnCancel)** - 调用 `shutdown /a` 取消关机计划，结束 `timeout.exe` 进程
-4. **倒计时更新 (UpdateCountdown)** - 每秒更新一次界面上的倒计时显示
-
-### 时间处理逻辑
-
-- **定时模式**: 解析 HH:MM 格式，若设定时间已过则自动设置为次日
-- **倒计时模式**: 将分钟转换为秒，立即计算目标时间戳
-- 使用 `time()` 和 `mktime()` 进行时间计算，跨天时自动处理日期递增
-
-### 系统操作实现
+## 系统操作实现
 
 | 操作 | 命令 |
 |------|------|
@@ -71,21 +89,26 @@ g++ -o AutoShutdown_Cyberpunk.exe AutoShutdown_Cyberpunk.cpp -mwindows -lcomctl3
 | 待机/休眠 | `rundll32 powrprof.dll,SetSuspendState 0,1,0` |
 | 取消任务 | `shutdown /a` |
 
-### UI 风格差异
+## 注意事项
 
-- **经典版**: 使用系统默认控件样式，依赖 `COLOR_WINDOW` 背景
-- **现代版**: 自定义绘制按钮、渐变背景、深色主题配色，使用 `SetWindowSubclass` 实现自绘按钮
-- **赛博朋克版**: 使用 GDI+ 实现渐变、发光边框、噪点纹理效果，霓虹配色方案
+- **待机功能问题**：部分系统可能阻止待机，运行 `修复待机.bat` 尝试修复
+- **权限问题**：待机和休眠功能需要管理员权限，建议使用管理员权限版本
+- **跨天时间**：定时模式会自动处理跨天情况
 
-### 依赖关系
+## 技术栈
 
-- **TCC (Tiny C Compiler)**: 轻量级编译器，推荐安装在 `C:\tcc`
-- **Windows SDK**: 需要 `windows.h`, `commctrl.h`, `shellapi.h`, `gdiplus.h`
-- **库文件**: `user32.lib`, `kernel32.lib`, `gdi32.lib`, `comctl32.lib`, `shell32.lib`, `gdiplus.lib`
+- **语言**: C / C++
+- **API**: Win32 API, GDI+
+- **编译器**: TCC, MinGW/g++
 
-### 注意事项
+## 许可证
 
-- 待机功能可能被系统驱动或程序阻止，运行 `修复待机.bat` 可尝试修复
-- 管理员权限版本使用 `ShellExecuteEx` 的 `runas` 动词请求提升权限
-- 赛博朋克版本需要 GDI+ 初始化 (`GdiplusStartup`) 和清理 (`GdiplusShutdown`)
-- 所有版本都使用 `CREATE_NO_WINDOW` 标志隐藏命令行窗口
+[MIT License](LICENSE)
+
+## 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+---
+
+**提示**: 这是一个个人学习项目，代码可能存在不完善之处，欢迎提出建议。
